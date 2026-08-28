@@ -10,6 +10,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   etl:
     runs-on: ubuntu-latest
@@ -28,7 +31,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      # 3. Install Python dependencies
+      # 3. Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
 
@@ -40,40 +43,46 @@ jobs:
       - name: Run ETL pipeline
         run: python src/main.py
 
-      # 6. Check database file
+      # 6. Show database file
       - name: Show the database file exists
         run: ls -lh etl.db
 
-      # 7. Check whether extract.py changed
-      - name: Check if extract.py changed
-        id: check_extract
-        run: |
-          if git diff --name-only HEAD^ HEAD | grep -q '^src/extract.py$'; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "extract.py was changed."
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "extract.py was not changed."
-          fi
-
-      # 8. Delete demo.txt if extract.py changed
+      # 7. Check if extract.py changed and delete demo.txt
       - name: Delete demo.txt if extract.py changed
-        if: steps.check_extract.outputs.changed == 'true'
+        if: github.event_name == 'push'
         run: |
-          if [ -f demo.txt ]; then
-            echo "extract.py changed. Deleting demo.txt..."
+          echo "Checking whether src/extract.py changed..."
 
-            rm demo.txt
+          if git diff --name-only HEAD^ HEAD | grep -q '^src/extract.py$'; then
 
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            echo "src/extract.py was changed."
 
-            git add demo.txt
-            git commit -m "Delete demo.txt because extract.py changed"
+            if [ -f demo.txt ]; then
 
-            git push
+              echo "demo.txt found. Deleting it..."
 
-            echo "demo.txt deleted successfully."
+              rm demo.txt
+
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+              git add demo.txt
+
+              git commit -m "Delete demo.txt because extract.py changed"
+
+              git push
+
+              echo "demo.txt deleted successfully."
+
+            else
+
+              echo "demo.txt does not exist."
+
+            fi
+
           else
-            echo "demo.txt does not exist."
+
+            echo "src/extract.py was not changed."
+            echo "demo.txt will not be deleted."
+
           fi
