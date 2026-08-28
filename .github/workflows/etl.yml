@@ -1,4 +1,4 @@
-name: ETL Pipeline
+name: MY ETL Pipeline
 
 # When this workflow runs:
 on:
@@ -30,3 +30,6 @@ jobs:
 
       - name: Run ETL pipeline
         run: python src/main.py
+
+      - name: Show the database file exists
+        run: ls -lh etl.db
