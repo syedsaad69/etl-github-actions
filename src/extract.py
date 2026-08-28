@@ -12,4 +12,5 @@ def extract_data(file_path: str) -> pd.DataFrame:
     print(f"[EXTRACT] Loaded yes yes {len(df)} rows from {file_path}")
     print(f"helllo")
     print("Testing GitHub Actions")
+    print("Testing GitHub Actions")
     return df
