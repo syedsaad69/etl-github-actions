@@ -23,4 +23,4 @@ def load_data(df: pd.DataFrame, database_url: str, table_name: str = "customers"
         if_exists="replace",
         index=False,
     )
-    print(f"[LOAD] Wrote {len(df)} rows to table '{table_name}' at {database_url}")
+    print(f"[LOAD] Wrote yes yes {len(df)} rows to table '{table_name}' at {database_url}")
